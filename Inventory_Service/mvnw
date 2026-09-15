@@ -1,0 +1,11 @@
+#!/usr/bin/env sh
+
+# This is a minimal wrapper for local runs.
+# It expects Maven to be installed in the environment.
+
+if [ -x "$(command -v mvn)" ]; then
+  exec mvn "$@"
+else
+  echo "Maven is not installed or not on PATH. Please install Maven and try again." >&2
+  exit 1
+fi

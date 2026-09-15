@@ -2,17 +2,18 @@ package com.example.kafka.demo.controller;
 
 import com.example.kafka.demo.model.Order;
 import com.example.kafka.demo.service.OrderProducerService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/orders")
+@RequestMapping("/api/orders")
 public class OrderController {
 
     private final OrderProducerService orderProducerService;
-
     private final Map<Long, Order> orders = new HashMap<>();
 
     public OrderController(OrderProducerService orderProducerService) {
@@ -20,19 +21,23 @@ public class OrderController {
     }
 
     @PostMapping
-    public String createOrder(@RequestBody Order order) {
+    public ResponseEntity<Map<String, Object>> createOrder(@RequestBody Order order) {
+        Order publishedOrder = orderProducerService.sendOrder(order);
+        orders.put(publishedOrder.getId(), publishedOrder);
 
-        orders.put(order.getId(), order);
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Order placed successfully and sent to Kafka.");
+        response.put("order", publishedOrder);
 
-        orderProducerService.sendOrder(order);
-
-        return "Order created successfully";
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
     }
 
     @GetMapping("/{id}")
-    public Order getOrder(@PathVariable Long id) {
-
-        return orders.get(id);
+    public ResponseEntity<Order> getOrder(@PathVariable Long id) {
+        Order order = orders.get(id);
+        if (order == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(order);
     }
-
 }
