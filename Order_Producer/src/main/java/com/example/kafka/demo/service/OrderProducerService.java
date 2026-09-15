@@ -15,7 +15,8 @@ public class OrderProducerService {
 
     private final KafkaTemplate<String, Order> kafkaTemplate;
 
-    public OrderProducerService(KafkaTemplate<String, Order> kafkaTemplate) {
+    public OrderProducerService(KafkaTemplate<String, Order> kafkaTemplate)
+    {
         this.kafkaTemplate = kafkaTemplate;
     }
 
