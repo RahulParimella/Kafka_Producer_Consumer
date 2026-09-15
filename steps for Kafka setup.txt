@@ -1,0 +1,54 @@
+If there is any Exceptions occurs 
+
+1. Make sure Kafka is stopped
+
+In the Kafka server CMD:
+
+Ctrl + C
+
+Then verify no Kafka Java process is running:
+
+tasklist | findstr java
+
+If Kafka is still running, stop it:
+Run : taskkill /F /IM java.exe
+
+2. Delete the old data directory
+
+Run: rmdir /s /q C:\tmp\kraft-combined-log
+
+3.Then verify 
+	dir C:\tmp
+
+
+1.Generate a new clusterId
+ Go to Kafka's bin\windows
+
+Run :kafka-storage.bat random-uuid
+
+v3j3KygnRC6L5B4s6u9M0Q -random uuid
+
+bin\windows\kafka-storage.bat format -t v3j3KygnRC6L5B4s6u9M0Q -c config\kraft\server.properties
+
+1. start kafka server
+
+bin\windows\kafka-server-start.bat config\kraft\server.properties
+
+2. create kafka topics
+kafka-topics.bat --create --topic order-topic --bootstrap-server localhost:9092 --partitions 4 --replication-factor 1
+
+
+3. list of topics
+kafka-topics.bat --list --bootstrap-server localhost:9092
+
+4. delete topic
+kafka-topics.bat --delete --topic order-topic --bootstrap-server localhost:9092
+
+5. check no of partitions
+kafka-topics.bat --describe --topic order-topic --bootstrap-server localhost:9092
+
+6.Check the latest offset in each partition
+kafka-get-offsets.bat --topic order-topic --bootstrap-server localhost:9092
+
+7. See the actual messages
+kafka-console-consumer.bat --topic order-topic --bootstrap-server localhost:9092 --from-beginning
